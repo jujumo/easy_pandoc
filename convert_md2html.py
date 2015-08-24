@@ -36,7 +36,9 @@ def replace_ref_in_file(html_filepath):
         os.close(tmp_file)
 
 
-def convert_md2html(input_filepath, output_filepath, css_filepath='',
+def convert_md2html(input_filepath,
+                    output_filepath,
+                    css_filepath=None,
                     skip_ref=False,
                     no_toc=False,
                     options=[]):
@@ -44,7 +46,7 @@ def convert_md2html(input_filepath, output_filepath, css_filepath='',
 
     input_filepath = realpath(input_filepath)
     output_filepath = realpath(output_filepath)
-    css_filepath = realpath(css_filepath)
+    css_filepath = realpath(css_filepath) if css_filepath else None
     prev_path = os.getcwd()
     try:
         # change current dir to MD file dir, to enable all relative path to this one
@@ -56,7 +58,7 @@ def convert_md2html(input_filepath, output_filepath, css_filepath='',
             pandoc_extra_args += ['--toc']
 
         if css_filepath:
-            pandoc_extra_args += ['--css='+css_filepath]
+            pandoc_extra_args += ['--css=' + css_filepath]
 
         pandoc_extra_args += options
 
