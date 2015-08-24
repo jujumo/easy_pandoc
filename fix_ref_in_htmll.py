@@ -12,7 +12,7 @@ MD_RE = re.compile(r'[^\.]+\.{}$'.format(MD_EXT))
 REFERENCE_EXT_RE = re.compile(r'(?P<pre>.*?<a href=\")(?P<ref>[^\.]+\.md)(?P<post>\">.*)', re.IGNORECASE)
 
 
-def convert_ref_in_file(html_filepath):
+def fix_ref_in_html(html_filepath):
     with open(html_filepath, 'r', encoding='UTF-8') as in_file:
         # Create temp file
         tmp_file, tmp_filepath = mkstemp()
