@@ -5,45 +5,20 @@ __author__ = 'jumo'
 import argparse
 import logging
 import os
-from os.path import splitext, abspath, dirname, exists, realpath
-import re
-from tempfile import mkstemp
-import shutil
+from os.path import splitext, dirname, exists, realpath
+
 try:
     import pypandoc
 except ImportError as e:
     logging.critical('pypandoc not installed. install Pandoc, and pypandoc.')
     raise
 
-MD_EXT = 'md'
 HTML_EXT = 'html'
-MD_RE = re.compile(r'[^\.]+\.{}$'.format(MD_EXT))
-
-
-def replace_ref_in_file(html_filepath):
-    REFERENCE_EXT_RE = re.compile(r'(?P<pre>.*?<a href=\")(?P<ref>[^\.]+\.md)(?P<post>\">.*)', re.IGNORECASE)
-    with open(html_filepath, 'r', encoding='UTF-8') as in_file:
-        # Create temp file
-        tmp_file, tmp_filepath = mkstemp()
-        try:
-            for line in in_file:
-                match = REFERENCE_EXT_RE.search(line)
-                if match:
-                    m = match.groupdict()
-                    new_ref = splitext(m['ref'])[0].replace('\\', '/') + '.html'
-                    line = m['pre'] + new_ref + m['post']
-                os.write(tmp_file, bytes(line, 'UTF-8'))
-            shutil.copy(tmp_filepath, html_filepath)
-        finally:
-            # always clean our mess
-            os.close(tmp_file)
-            os.remove(tmp_filepath)
 
 
 def convert_md2html(input_filepath,
                     output_filepath,
                     css_filepath=None,
-                    skip_ref=False,
                     no_toc=False,
                     options=[]):
     logging.debug('convert {} to {}'.format(input_filepath, output_filepath))
@@ -80,10 +55,6 @@ def convert_md2html(input_filepath,
             extra_args=pandoc_extra_args,
             outputfile=output_filepath)
 
-        if not skip_ref:
-            # replace href to md file with ref to html
-            replace_ref_in_file(output_filepath)
-
     finally:
         os.chdir(prev_path)
 
@@ -96,8 +67,6 @@ def main():
         parser.add_argument('-o', '--output', help='output')
         parser.add_argument('--css', help='css filepath')
         parser.add_argument('--no_toc', action='store_true', help='do not insert table of content in header section')
-        parser.add_argument('--skip_ref', action='store_true', help='do not convert link.')
-
         args = parser.parse_args()
 
         if args.verbose:
@@ -121,7 +90,6 @@ def main():
 
         convert_md2html(
             input_filepath, output_filepath, css_filepath,
-            skip_ref=args.skip_ref,
             no_toc=args.no_toc)
 
     except Exception as e:
