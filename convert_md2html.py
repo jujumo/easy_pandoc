@@ -25,15 +25,19 @@ def replace_ref_in_file(html_filepath):
     with open(html_filepath, 'r', encoding='UTF-8') as in_file:
         # Create temp file
         tmp_file, tmp_filepath = mkstemp()
-        for line in in_file:
-            match = REFERENCE_EXT_RE.search(line)
-            if match:
-                m = match.groupdict()
-                new_ref = splitext(m['ref'])[0].replace('\\', '/') + '.html'
-                line = m['pre'] + new_ref + m['post']
-            os.write(tmp_file, bytes(line, 'UTF-8'))
-        shutil.copy(tmp_filepath, html_filepath)
-        os.close(tmp_file)
+        try:
+            for line in in_file:
+                match = REFERENCE_EXT_RE.search(line)
+                if match:
+                    m = match.groupdict()
+                    new_ref = splitext(m['ref'])[0].replace('\\', '/') + '.html'
+                    line = m['pre'] + new_ref + m['post']
+                os.write(tmp_file, bytes(line, 'UTF-8'))
+            shutil.copy(tmp_filepath, html_filepath)
+        finally:
+            # always clean our mess
+            os.close(tmp_file)
+            os.remove(tmp_filepath)
 
 
 def convert_md2html(input_filepath,
