@@ -24,11 +24,12 @@ def fix_ref_in_html(input_filepath, output_filepath=''):
                 if MD_RE.match(aref['href']):
                     # here whe have a reference to md file
                     # replace the extension by HTML
+                    logging.debug('fixing ref to {}'.format(aref['href']))
                     aref['href'] = MD_RE.sub(r'\1{}'.format(HTML_EXT), aref['href'])
             # rewrite the html content
-            print(content_tree)
-            with open(tmp_filepath, 'w') as tmp_file:
-                tmp_file.write(str(content_tree))
+            with open(tmp_filepath, 'wb') as tmp_file:
+                content_str = content_tree.prettify('latin-1')
+                tmp_file.write(content_str)
             shutil.copy(tmp_filepath, input_filepath)
         finally:
             # always clean our mess
