@@ -15,6 +15,14 @@ except ImportError as e:
 
 HTML_EXT = 'html'
 
+PANDOC_SYSTEMATIC_OPTIONS = [
+    '--from', 'markdown_github',
+    '--to', 'html5',
+    '--smart',
+    '--standalone',
+    '--self-contained',
+    '--latexmathml']
+
 
 def convert_md2html(input_filepath,
                     output_filepath,
@@ -32,10 +40,9 @@ def convert_md2html(input_filepath,
         os.chdir(dirname(input_filepath))
 
         # prepare constant arguments for pandoc
-        pandoc_extra_args = ['--smart', '--standalone', '--self-contained']
+        pandoc_extra_args = PANDOC_SYSTEMATIC_OPTIONS
         if not no_toc:
             pandoc_extra_args += ['--toc']
-
         if css_filepath:
             pandoc_extra_args += ['--css=' + css_filepath]
 
